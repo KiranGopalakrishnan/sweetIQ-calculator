@@ -1,0 +1,32 @@
+{
+  "name": "calculator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "watch": {
+    "build": {
+      "patterns": [
+        "./"
+      ],
+      "extensions": "js,html,css",
+      "ignore":"./build/",
+      "quiet": false
+    }
+  },
+  "scripts": {
+    "build": "del-cli build/* &&npx postcss css/*.css --use autoprefixer -d build/css/ && copyfiles js/*.js build/ && copyfiles *.html build/",
+    "start": "http-server build/ -o",
+    "watch":" npm-watch build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "autoprefixer": "^7.1.6",
+    "copyfiles": "^1.2.0",
+    "del-cli": "^1.1.0",
+    "http-server": "^0.7.6",
+    "npm-watch": "^0.3.0",
+    "postcss-cli": "^4.1.1"
+  }
+}
