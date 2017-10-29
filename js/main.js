@@ -47,26 +47,45 @@ var Stack = {
   }
   function generateOpStack(opString){
     var response = opString;
-    var opArray = opString.split('');
-    var bracketOpenIndex = [];
-    var bracketClosedIndex = [];
-    for(var i=0;i<opArray.length;i++){
+    var separators = ['\\\(', '\\\)'];
+    var opArray = opString.split(new RegExp(separators.join('|'), 'g'));
+    console.log(opArray);
+    //we start from right
+    /*for(var i=opArray.length-1;i>0;i--){
       if(opArray[i]==='('){
-        bracketOpenIndex.push(i)
+        //bracketOpenIndex.push(i);
+        //console.log(opArray[i]);
+        for(var j=i;j<opArray.length;j++){
+
+          //console.log("--------");
+          //console.log(opArray[j]);
+          if(opArray[j]===')'){
+            var single_operation = opArray.splice(i,j);//.join("");
+            console.log(single_operation);
+            break;
+            //single_operation = single_operation.replace(/\(/g,"").replace(/\)/g,"");
+        }
+        }
       }
     }
-    console.log(opArray);
-    //Reversing the array to match with the closed bracket indexes
-   bracketOpenIndex.reverse();
-    console.log(bracketOpenIndex);
-    console.log(bracketClosedIndex);
-    response = bracketOpenIndex.length === bracketOpenIndex.length ? response : "Error";
-    for(var i=0;i<opArray.length;i++){
-      var single_operation = opArray.splice(bracketOpenIndex[i],bracketClosedIndex[(i+1)]).join("");
-      //single_operation = single_operation.replace(/\(/g,"").replace(/\)/g,"");
-      //console.log(single_operation);
-    }
-    //console.log(opArray);
+    bracketOpenIndex.sort(function(a,b){
+      return b-a;
+    })*/
+    /*
+    for(var i=0;i<bracketOpenIndex.length;i++){
+console.log(bracketOpenIndex[i]);
+      for(var j=bracketOpenIndex[i];j<opArray.length;j++){
+
+    console.log(j);
+
+          if(opArray[j]===')'){
+            var single_operation = opArray.splice(i,(j+1));//.join("");
+            console.log(single_operation);
+            //single_operation = single_operation.replace(/\(/g,"").replace(/\)/g,"");
+        }
+      }
+    }*/
+    response = bracketOpenIndex.length === 0 ? response : "Error";
     return response;
   }
 })();
