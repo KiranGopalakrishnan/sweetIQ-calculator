@@ -24,10 +24,12 @@
   function handleKeyPress(event){
     var pressedKeyChar = String.fromCharCode(event.keyCode);
     var pressedKeyCode = event.keyCode;
-    var enterKeyCode = "13";
+    var enterKeyCode = 13;
     var screenValue = calculatorScreen.value
-    if(pressedKeyCode===enterKeyCode){
-        calculator.calculate(screenValue);
+    if(pressedKeyCode === enterKeyCode){
+      var result = calculator.calculate(screenValue);
+      calculatorScreen.value = result;
+      calculatorScreen.focus();
     }
   }
 function addToScreen(currentScreenValue,clickedButtonValue){
