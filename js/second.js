@@ -18,12 +18,6 @@
   }
 
   function Calculator() {
-      this.calculate = function(string){
-        var stack = new Stack();
-        var generatedStack = this.generateOpStack(string,stack);
-        var calculatedOutput = this.calculatedOutput(calculateStackItems);
-        console.log(calculatedOutput);
-      },
     this.opList=["*","/","+","-"],
     this.opFunctions=[
       //Same presidence operators are grouped together in left to right order
@@ -49,15 +43,25 @@
   function handleButtonClick(event){
     var clickedButtonValue = event.target.value;
     var currentScreenValue = calculatorScreen.value;
-    var stack = new Stack();
-    var result = clickedButtonValue==='='?generateOpListtack(currentScreenValue,stack):addToScreen(currentScreenValue,clickedButtonValue);
+    var calculator = new Calculator();
+    var result = clickedButtonValue==='='?calculator.calculate(currentScreenValue):addToScreen(currentScreenValue,clickedButtonValue);
     calculatorScreen.value = result;
     calculatorScreen.focus();
   }
-  Calculator.prototype.generateOpListtack = function(string,stackObj){
+
+  Calculator.prototype.calculate = function(string){
+      var stack = new Stack();
+      var generatedOpStack = this.generateOpStack(string,stack);
+      var calculatedOutput = this.calculateStackItems(generatedOpStack);
+      console.log(calculatedOutput);
+      return calculatedOutput;
+    }
+
+  Calculator.prototype.generateOpStack = function(string,stackObj){
     var stack = stackObj;
     var array = string.split("");
     var tempArray = [];
+    let selfe = this;
     array.forEach(function(item){
       if(item === ')'){
         var tempArray=[];
@@ -69,22 +73,24 @@
         }
         //reverse the array because we are going backwords in the while loop
       var bracketString = tempArray.reverse().join("");
-      var parsedOperationArray = parseOperationString(bracketString);
-      var clearedOperationArray = clearArray(parsedOperationArray);
+      var parsedOperationArray = selfe.parseOperationString(bracketString);
+      var clearedOperationArray = selfe.clearArray(parsedOperationArray);
 
-      console.log(clearedOperationArray);
+      //console.log(clearedOperationArray);
 
-      var output = performOperations(clearedOperationArray);
+      var output = selfe.performOperations(clearedOperationArray);
 
-      console.log(output);
+      //console.log(output);
       var result = output;
       stack.push(result);
       }else{
         stack.push(item);
       }
     });
-    return output;
-    //call calcStack();
+    //returning the filled stack
+
+    console.log(stack.stack);
+    return stack;
   }
   var addToScreen = function(currentScreenValue,clickedButtonValue){
     return currentScreenValue+clickedButtonValue;
@@ -100,13 +106,13 @@
     }
     //joining the stack items together for parsing
     var stackOpString = tempArray.reverse().join("");
-    var parsedOperationArray = parseOperationString(stackOpString);
-    var output = performOperations(parsedOperationArray);
+    var parsedOperationArray = this.parseOperationString(stackOpString);
+    var output = this.performOperations(parsedOperationArray);
     return output;
   }
   Calculator.prototype.performOperations= function(array){
     //getting the operation functions from the calculator object
-    var opList = this.opFunctions,
+    var opList = this.opFunctions;
     var newArray = [];
     var currentOperator;
     for (var i = 0; i < opList.length; i++) {
@@ -176,4 +182,5 @@
    }
    return newArray;
   }
+
 })();
