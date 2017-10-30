@@ -1,6 +1,7 @@
 (function(){
 
   var calculatorScreen = document.getElementById('screen');
+  calculatorScreen.focus();
   var button = document.getElementsByClassName('button');
 
   //creating a new calculator object
