@@ -21,11 +21,6 @@ function Calculator() {
   this.getAllowedCharacters = function(){
     return this.allowedCharacters;
   }
-  //decides the precision following the decimal point
-  this.decimalPrecision=5,
-  this.setDecimalPrecision=function(number){
-    this.decimalPrecision = number;
-  },
   this.opFunctions=[
     //Same presidence operators are grouped together in left to right order
     {
@@ -36,22 +31,19 @@ function Calculator() {
       '+': function(a, b){ return a + b},
       '-': function(a, b){ return a - b}
     }
-  ]
+  ];
 }
 
 Calculator.prototype.calculate = function(string){
-  var response;
   var stack = new Stack();
   var error = this.checkError(string);
+  let result = "Error";
   if(!error){
     var generatedOpStack = this.generateOpStack(string,stack);
-    response = this.calculateStackItems(generatedOpStack);
-  }else{
-    response = "Error";
+    result = this.calculateStackItems(generatedOpStack);
   }
-  console.log(error);
-  //calculatedOutput = calculatedOutput.toFixed(this.decimalPrecision);
-  return response;
+  result = failChecks(result);
+  return result;
 }
 
 Calculator.prototype.generateOpStack = function(string,stackObj){
@@ -182,6 +174,9 @@ Calculator.prototype.clearArray =  function(array){
   }
   return newArray;
 }
+/*
+* Checks for math operational errors in the string
+*/
 Calculator.prototype.checkError = function(string){
   var response = false;
   var stringArray = string.split("");
@@ -194,6 +189,16 @@ Calculator.prototype.checkError = function(string){
       closedBracketCount++;
     }
   });
+  //checking if the open brakcet count matc closed bracket closedBracketCount
+  //to determine if all brackets have been closed before processing the string
   response = openBracketsCount===closedBracketCount?false:true;
+  //checking for alphabets in screen string
   return response;
+}
+function failChecks(value){
+var result=value;
+  if(value!==value||value===undefined||value===null||value===""){
+    result='Error';
+  }
+  return result;
 }

@@ -15,7 +15,6 @@
 
   //handles the button clicks
   function handleButtonClick(event){
-      event.target.className +=" button-clicked";
     var clickedButtonValue = event.target.value;
     var currentScreenValue = calculatorScreen.value;
     var result = clickedButtonValue==='='?calculator.calculate(currentScreenValue):addToScreen(currentScreenValue,clickedButtonValue);

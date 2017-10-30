@@ -22,7 +22,8 @@ html,body{
   justify-content: center;
   align-items: center;
   padding: 1em;
-  width: 30%;
+  width: 100%;
+  flex: 1;
   border: solid 2px #CCC;
   box-sizing: border-box;
   background: #FFF;
@@ -35,7 +36,6 @@ html,body{
 }
 .input-screen input.screen{
   display: inherit;
-  flex:1;
   color: #27ae60;
   font-size: 3.5em;
   background: transparent;
@@ -44,6 +44,18 @@ html,body{
   text-align: right;
   font-family: 'Roboto',sans-serif;
   font-weight: 100;
+}
+input.screen::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+  color: #27ae60;
+}
+input.screen::-moz-placeholder { /* Firefox 19+ */
+  color: #27ae60;
+}
+input.screen:-ms-input-placeholder { /* IE 10+ */
+  color: #27ae60;
+}
+input.screen:-moz-placeholder { /* Firefox 18- */
+  color: #27ae60;
 }
 input.screen:focus{
   outline: none;
@@ -86,13 +98,25 @@ input.screen:focus{
   box-sizing: border-box;
   width: 100%;
   cursor: pointer;
-  transition: all 0.5s ease-in-out;
+  transition: all 1s ease-in-out;
   font-family: 'Roboto',sans-serif;
   font-weight: 100;
 }
 .single-button .button:focus{
   outline: none;
 }
+.single-button .button:hover{
+  background: #e74c3c;
+  border-color: #c0392b;
+}
 .button-clicked{
-  border-bottom-width: 1px;
+  border-bottom-width: 1px !important;
+}
+/* MEDIA QUERIES*/
+/* Larger than tablet */
+@media (min-width: 750px) {
+  .main-wrapper .calculator-widget-wrapper{
+    width: 30%;
+    flex: none;
+  }
 }
