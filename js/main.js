@@ -1,28 +1,15 @@
 (function(){
 
   'use strict';
-var Stack = {
-  stack:[],
-  pointer:0,
-  push:function(item){
-    stack.push(item);
-    this.pointer++;
-  },
-  pop:function(){
-    stack.slice(this.pointer-1,this.pointer);
-    this.pointer--;
-  },
-  peek:function(){
-    return stack[pointer];
-  }
-}
+
   var calculator = {
     calculate:function(screenString){
       var calcString = screenString;
       var operationOrderArray = [];
       var calcStringArray = calcString.split('(');
       this.generateOpStack(calcStringArray);
-    }
+    },
+    operationsList:"*/+-"
   };
 
   var calculatorScreen = document.getElementById('screen');
@@ -45,47 +32,129 @@ var Stack = {
   var addToScreen = function(currentScreenValue,clickedButtonValue){
     return currentScreenValue+clickedButtonValue;
   }
+
   function generateOpStack(opString){
     var response = opString;
-    var separators = ['\\\(', '\\\)'];
-    var opArray = opString.split(new RegExp(separators.join('|'), 'g'));
-    console.log(opArray);
-    //we start from right
-    /*for(var i=opArray.length-1;i>0;i--){
-      if(opArray[i]==='('){
-        //bracketOpenIndex.push(i);
-        //console.log(opArray[i]);
-        for(var j=i;j<opArray.length;j++){
-
-          //console.log("--------");
-          //console.log(opArray[j]);
-          if(opArray[j]===')'){
-            var single_operation = opArray.splice(i,j);//.join("");
-            console.log(single_operation);
-            break;
-            //single_operation = single_operation.replace(/\(/g,"").replace(/\)/g,"");
-        }
-        }
-      }
-    }
-    bracketOpenIndex.sort(function(a,b){
-      return b-a;
-    })*/
-    /*
-    for(var i=0;i<bracketOpenIndex.length;i++){
-console.log(bracketOpenIndex[i]);
-      for(var j=bracketOpenIndex[i];j<opArray.length;j++){
-
-    console.log(j);
-
-          if(opArray[j]===')'){
-            var single_operation = opArray.splice(i,(j+1));//.join("");
-            console.log(single_operation);
-            //single_operation = single_operation.replace(/\(/g,"").replace(/\)/g,"");
-        }
-      }
-    }*/
-    response = bracketOpenIndex.length === 0 ? response : "Error";
+    var depthArray = retrieveDepths(opString);
+    console.log("depth array");
+    console.log(depthArray);
+    var sortedDepthArray = sortBasedOnDepth(depthArray);
+    /*sortedDepthArray.forEach(function(item){
+      var parsedOperationArray = parseOperationString(item.token);
+      var clearedOperationArray = clearArray(parsedOperationArray);
+      var output = performOperation(clearedOperationArray);
+      console.log("output");
+      console.log(parsedOperationArray);
+    });*/
     return response;
   }
+  function performOperation(array,prevResult=""){
+    var response="";
+    response += prevResult;
+    console.log("res");
+    console.log(response);
+    if(array.length>=3){
+      var singleOpArray = array.splice(0,3);
+      var a = singleOpArray[0],b = singleOpArray[1],c = singleOpArray[2];
+      response += singleOperation(a,b,c);
+    }else{
+      response = response+array.join("");
+      return response;
+    }
+    //recursion
+    performOperation(array,response);
+  }
+  function singleOperation(a,operand,b){
+    a = a*1.0;
+    b= b*1.0;
+    var response=0;
+    if()
+        response = add(a,b);
+        break;
+      case "-":
+      response = subtract(a,b);
+      break;
+      case "*":
+      response = multiply(a,b);
+      break;
+      case "/":
+      response = divide(a,b);
+      break;
+    }
+    return response;
+  }
+  function add(a,b){
+    return a+b;
+  }
+  function subtract(a,b){
+    return a-b;
+  }
+  function multiply(a,b){
+    return a*b;
+  }
+  function divide(a,b){
+    return a/b;
+  }
+  function retrieveDepths(opString){
+    var tokens = opString.split(/([()])/), result = [], depth = 0;
+    tokens.forEach(function scan(token){
+      if(!token) return;
+      if(token === "(") {
+        depth++;
+        return;
+      }
+      if(token === ")") {
+        depth--;
+        return;
+      }
+      result.push({depth: depth, token: token});
+
+    });
+    return result;
+  }
+  //Sorts the array based on depth
+  function sortBasedOnDepth(array){
+    //sorting DESC
+    return array.sort(function(a,b){
+      return b.depth-a.depth;
+    });
+  }
+  //Parses the provided operation string into floats and operands
+  function parseOperationString(opString) {
+    var calculation = [],
+        current = '',
+        string = opString;
+        var operationsList = calculator.operationsList;
+    for (var i = 0, ch; ch = string.charAt(i); i++) {
+      var operaterPosition = operationsList.indexOf(ch);
+        if ( operaterPosition > -1) {
+            if (current == '' && ch == '-') {
+                current = '-';
+            } else {
+              if(current != ''){
+                calculation.push(parseFloat(current), ch);
+                current = '';
+              }else{
+                calculation.push(current,ch);
+              }
+            }
+        } else {
+            current += string.charAt(i);
+        }
+    }
+    if (current != '') {
+        calculation.push(parseFloat(current));
+    }
+    return calculation;
+}
+//Clearing out the empty values from the array
+function clearArray(array){
+  var newArray = [];
+for (var i = 0; i < array.length; i++) {
+  if (array[i] !== undefined && array[i] !== null && array[i] !== "") {
+    newArray.push(array[i]);
+  }
+ }
+ return newArray;
+}
 })();

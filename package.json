@@ -14,7 +14,7 @@
     }
   },
   "scripts": {
-    "build": "del-cli build/* &&npx postcss css/*.css --use autoprefixer -d build/css/ && copyfiles js/*.js build/ && copyfiles *.html build/",
+    "build": "del-cli ./build/* &&npx postcss css/*.css --use autoprefixer -d build/css/ && copyfiles js/*.js build/ && copyfiles *.html build/",
     "start": "http-server build/ -o",
     "watch":" npm-watch build",
     "test": "echo \"Error: no test specified\" && exit 1"
