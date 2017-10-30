@@ -21,6 +21,9 @@
     this.opList=["*","/","+","-"],
     //Characters allowed on the calculator
     this.allowedCharacters=["0","1","2","3","4","5","6","7","8","9",".","(",")"].concat(this.opList),
+    this.getAllowedCharacters = function(){
+      return this.allowedCharacters;
+    }
     this.decimalPrecision=5,
     this.setDecimalPrecision=function(number){
       this.decimalPrecision = number;
