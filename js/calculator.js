@@ -13,7 +13,11 @@ function Stack(){
     return this.stack.pop();
   }
 }
-
+/*
+*For adding new functionality
+*addthe operation and method to opFunctions
+*and add the operator to opList
+*/
 function Calculator() {
   this.opList=["*","/","+","-"],
   //Characters allowed on the calculator
@@ -22,7 +26,7 @@ function Calculator() {
     return this.allowedCharacters;
   }
   this.opFunctions=[
-    //Same presidence operators are grouped together in left to right order
+    //Same presidence operators are grouped together
     {
       '*': function(a, b){ return a * b},
       '/': function(a, b){ return a / b}
@@ -33,7 +37,7 @@ function Calculator() {
     }
   ];
 }
-
+//Calculates and returns the entire operation result
 Calculator.prototype.calculate = function(string){
   var stack = new Stack();
   var error = this.checkError(string);
