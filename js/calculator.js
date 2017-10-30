@@ -19,6 +19,12 @@
 
   function Calculator() {
     this.opList=["*","/","+","-"],
+    //Characters allowed on the calculator
+    this.allowedCharacters=["0","1","2","3","4","5","6","7","8","9",".","(",")"].concat(this.opList),
+    this.decimalPrecision=5,
+    this.setDecimalPrecision=function(number){
+      this.decimalPrecision = number;
+    },
     this.opFunctions=[
       //Same presidence operators are grouped together in left to right order
       {
@@ -32,28 +38,12 @@
     ]
   }
 
-  var calculatorScreen = document.getElementById('screen');
-  var button = document.getElementsByClassName('button');
-
-  for(var i=0;i<button.length;i++){
-    button[i].addEventListener('click',handleButtonClick,false);
-  }
-
-  //handles the button clic1ks
-  function handleButtonClick(event){
-    var clickedButtonValue = event.target.value;
-    var currentScreenValue = calculatorScreen.value;
-    var calculator = new Calculator();
-    var result = clickedButtonValue==='='?calculator.calculate(currentScreenValue):addToScreen(currentScreenValue,clickedButtonValue);
-    calculatorScreen.value = result;
-    calculatorScreen.focus();
-  }
-
   Calculator.prototype.calculate = function(string){
       var stack = new Stack();
       var generatedOpStack = this.generateOpStack(string,stack);
       var calculatedOutput = this.calculateStackItems(generatedOpStack);
-      console.log(calculatedOutput);
+      //setting precision
+      calculatedOutput = calculatedOutput.toFixed(this.decimalPrecision);
       return calculatedOutput;
     }
 
