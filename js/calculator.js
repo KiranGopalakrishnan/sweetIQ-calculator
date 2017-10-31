@@ -13,15 +13,24 @@ function Stack(){
     return this.stack.pop();
   }
 }
+
 /*
 *For adding new functionality
 *addthe operation and method to opFunctions
 *and add the operator to opList
 */
+
 function Calculator() {
   this.opList=["*","/","+","-"],
   //Characters allowed on the calculator
-  this.allowedCharacters=["0","1","2","3","4","5","6","7","8","9",".","(",")"].concat(this.opList),
+  this.allowedCharacters=["0","1","2","3","4","5","6","7","8","9",".","(",")"].concat(this.opList);
+  this.decimalPrecision = 2; //5 after the decimal point
+  this.setDecimalPrecision = function(value){
+    this.decimalPrecision = value;
+  }
+  this.getDecimalPrecision = function(){
+    return this.decimalPrecision
+  }
   this.getAllowedCharacters = function(){
     return this.allowedCharacters;
   }
@@ -40,6 +49,7 @@ function Calculator() {
 //Calculates and returns the entire operation result
 Calculator.prototype.calculate = function(string){
   var stack = new Stack();
+  ///checks if all bracjet opening and closing have been matched
   var error = this.checkError(string);
   let result = "Error";
   if(!error){
@@ -47,6 +57,7 @@ Calculator.prototype.calculate = function(string){
     result = this.calculateStackItems(generatedOpStack);
   }
   result = failChecks(result);
+  result = applyDecimalPrecision(this.getDecimalPrecision(),result);
   return result;
 }
 
@@ -164,6 +175,7 @@ Calculator.prototype.parseOperationString = function(opString) {
     }
   }
   if (current !== '') {
+    //Number
     calculation.push(parseFloat(current));
   }
   return calculation;
@@ -195,14 +207,19 @@ Calculator.prototype.checkError = function(string){
   });
   //checking if the open brakcet count matc closed bracket closedBracketCount
   //to determine if all brackets have been closed before processing the string
-  response = openBracketsCount===closedBracketCount?false:true;
-  //checking for alphabets in screen string
+  response = (openBracketsCount===closedBracketCount?false:true);
   return response;
 }
+// checks for all possible non numeric responses
+// and if true returns 'Error'
 function failChecks(value){
 var result=value;
-  if(value!==value||value===undefined||value===null||value===""){
+  if(value!==value||value===undefined||value===null||value===""||value===Infinity){
     result='Error';
   }
   return result;
+}
+function applyDecimalPrecision(precision,result){
+  var response = (result!=='Error'?parseFloat(result.toFixed(precision)):result);
+  return response;
 }
