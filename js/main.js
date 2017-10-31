@@ -6,6 +6,7 @@
 
   //creating a new calculator object
   var calculator = new Calculator();
+  calculator.setDecimalPrecision(2);
 
   //attaching event listners to all buttons
   for(var i=0;i<button.length;i++){
