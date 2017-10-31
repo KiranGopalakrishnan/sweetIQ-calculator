@@ -14,7 +14,7 @@
     }
   },
   "scripts": {
-    "build": "del-cli ./build/* &&npx postcss css/*.css --use autoprefixer -d build/css/ && copyfiles js/*.js build/ && copyfiles tests/* build/ && copyfiles *.html build/",
+    "build": "del-cli ./build/* && npx postcss css/*.css --use autoprefixer -d build/css/ && copyfiles js/*.js build/ && copyfiles tests/* build/ && copyfiles *.html build/",
     "start": "npm run build && http-server build/ -o",
     "watch": "npm-watch build",
     "test": "http-server tests/ -o"
@@ -27,6 +27,7 @@
     "del-cli": "^1.1.0",
     "http-server": "^0.10.0",
     "npm-watch": "^0.3.0",
+    "npx": "^9.7.1",
     "postcss-cli": "^4.1.1",
     "qunit": "^1.0.0"
   }
