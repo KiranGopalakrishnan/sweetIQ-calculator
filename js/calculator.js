@@ -21,7 +21,7 @@ function Stack(){
 */
 
 function Calculator() {
-  this.opList=["*","/","+","-"],
+  this.opList=["*","/","+","-"];
   //Characters allowed on the calculator
   this.allowedCharacters=["0","1","2","3","4","5","6","7","8","9",".","(",")"].concat(this.opList);
   this.decimalPrecision = 2; //5 after the decimal point
@@ -49,15 +49,26 @@ function Calculator() {
 //Calculates and returns the entire operation result
 Calculator.prototype.calculate = function(string){
   var stack = new Stack();
+
+  console.log("check p 1");
   ///checks if all bracjet opening and closing have been matched
   var error = this.checkError(string);
   let result = "Error";
+  console.log("check p 1");
   if(!error){
     var generatedOpStack = this.generateOpStack(string,stack);
+
+    console.log("check p 2");
     result = this.calculateStackItems(generatedOpStack);
+
+    console.log("check p 3");
   }
   result = failChecks(result);
+
+  console.log("check p 4");
   result = applyDecimalPrecision(this.getDecimalPrecision(),result);
+
+  console.log("check p 5");
   return result;
 }
 
@@ -80,7 +91,7 @@ Calculator.prototype.generateOpStack = function(string,stackObj){
       //reverseing the array to ensure operation order is kept as the original string
       var bracketString = tempArray.reverse().join("");
       var parsedOperationArray = selfe.parseOperationString(bracketString);
-      var clearedOperationArray = selfe.clearArray(parsedOperationArray);
+      var clearedOperationArray = clearArray(parsedOperationArray);
       var output = selfe.performOperations(clearedOperationArray);
 
       //console.log(output);
@@ -140,7 +151,7 @@ Calculator.prototype.performOperations= function(array){
   }
   if (array.length > 1) {
     console.log('Error :(');
-    return array;
+    return 'Error';
   } else {
     return array[0];
   }
@@ -158,6 +169,7 @@ Calculator.prototype.parseOperationString = function(opString) {
     var operaterPosition = operationsList.indexOf(ch);
     if ( operaterPosition > -1) {
       if (current == '' && ch == '-') {
+        //beginning of a signed integer
         current = '-';
       } else {
         if(current !== ''){
@@ -181,7 +193,7 @@ Calculator.prototype.parseOperationString = function(opString) {
   return calculation;
 }
 //Clearing out the empty values from an array
-Calculator.prototype.clearArray =  function(array){
+function clearArray(array){
   var newArray = [];
   for (var i = 0; i < array.length; i++) {
     if (array[i] !== undefined && array[i] !== null && array[i] !== "") {
@@ -197,11 +209,11 @@ Calculator.prototype.checkError = function(string){
   var response = false;
   var stringArray = string.split("");
   var openBracketsCount=0,closedBracketCount=0;
-  stringArray.forEach(function(item){
+  stringArray.forEach(function(item,index){
     if(item ==='('){
       openBracketsCount++;
     }
-    if(item === ')'){
+    if(item === ')'&&openBracketsCount>0){
       closedBracketCount++;
     }
   });
