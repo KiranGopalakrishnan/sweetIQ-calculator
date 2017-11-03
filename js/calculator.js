@@ -1,137 +1,191 @@
-//Not enclosing in a ASIF because the main.js requires the caclulator object
-'use strict';
-//Stack implemented as a constructor function
+
+"use strict";
+
+//Stack implemetation
 function Stack(){
-  this.stack=[];
+  var stack=[];
   this.push = function(item){
-    this.stack.push(item);
+    stack.push(item);
   }
   this.size = function(){
-    return this.stack.length;
+    return stack.length;
   }
   this.pop = function(){
-    return this.stack.pop();
+    return stack.pop();
   }
 }
 
 /*
 *For adding new functionality
-*addthe operation and method to opFunctions
+*add the operation and method to opFunctions
 *and add the operator to opList
 */
-
 function Calculator() {
-  this.opList=["*","/","+","-"];
-  //Characters allowed on the calculator
-  this.allowedCharacters=["0","1","2","3","4","5","6","7","8","9",".","(",")"].concat(this.opList);
-  this.decimalPrecision = 2; //5 after the decimal point
+  //options set to default
+  var opList=["*","/","+","-"];
+  //default Characters allowed on the calculator
+  var allowedCharacters=["0","1","2","3","4","5","6","7","8","9",".","(",")"].concat(opList);
+  var decimalPrecision = 2; //2 after the decimal point
+  var opFunctions=[
+    //Same presidence operators are grouped together
+    {
+      "*": function(a, b){ return a * b},
+      "/": function(a, b){ return a / b}
+    },
+    {
+      "+": function(a, b){ return a + b},
+      "-": function(a, b){ return a - b}
+    }
+  ];
+  /* Getters and Setters for the private vars*/
   this.setDecimalPrecision = function(value){
     this.decimalPrecision = value;
   }
   this.getDecimalPrecision = function(){
-    return this.decimalPrecision
+    return decimalPrecision;
+  }
+  this.setAllowedCharacters = function(array){
+    allowedCharacters=array;
   }
   this.getAllowedCharacters = function(){
-    return this.allowedCharacters;
+    return allowedCharacters;
   }
-  this.opFunctions=[
-    //Same presidence operators are grouped together
-    {
-      '*': function(a, b){ return a * b},
-      '/': function(a, b){ return a / b}
-    },
-    {
-      '+': function(a, b){ return a + b},
-      '-': function(a, b){ return a - b}
-    }
-  ];
+  this.setOpList=function(array){
+    opList = array;
+  }
+  this.getOpList=function(){
+    return opList;
+  }
+  this.setOpFunctions=function(array){
+    opFunctions = array;
+  }
+  this.getOpFunctions=function(){
+    return opFunctions;
+  }
 }
 //Calculates and returns the entire operation result
 Calculator.prototype.calculate = function(string){
   var stack = new Stack();
-
-  console.log("check p 1");
-  ///checks if all bracjet opening and closing have been matched
-  var error = this.checkError(string);
+  var error = this.preErrorChecks(string);
+  //Block level scope for result
   let result = "Error";
-  console.log("check p 1");
   if(!error){
     var generatedOpStack = this.generateOpStack(string,stack);
-
-    console.log("check p 2");
     result = this.calculateStackItems(generatedOpStack);
-
-    console.log("check p 3");
   }
-  result = failChecks(result);
-
-  console.log("check p 4");
-  result = applyDecimalPrecision(this.getDecimalPrecision(),result);
-
-  console.log("check p 5");
+  result = this.postErrorChecks(result);
+  result = this.applyDecimalPrecision(this.getDecimalPrecision(),result);
   return result;
 }
 
 Calculator.prototype.generateOpStack = function(string,stackObj){
+  var selfe = this;
   var stack = stackObj;
   var array = string.split("");
-  let selfe = this;
+
   array.forEach(function(item){
     if(item === ')'){
+
       //Closing bracket found
       //Iterate back until we find a matching opening bracket
       var tempArray=[];
       var nextItem= stack.pop();
-
       while(nextItem !== '('){
         //keep popping items out of stack until the matching opening bracket is found
         tempArray.push(nextItem);
         nextItem= stack.pop();
       }
+
       //reverseing the array to ensure operation order is kept as the original string
       var bracketString = tempArray.reverse().join("");
-      var parsedOperationArray = selfe.parseOperationString(bracketString);
-      var clearedOperationArray = clearArray(parsedOperationArray);
-      var output = selfe.performOperations(clearedOperationArray);
-
-      //console.log(output);
-      var result = output;
+      var opList = selfe.getOpList();
+      var opFunctions = selfe.getOpFunctions();
+      var result = selfe.parseAndCalculate(bracketString,opList,opFunctions);
       stack.push(result);
+
     }else{
       stack.push(item);
     }
+
   });
   //returning the filled stack
-  //console.log(stack.stack);
   return stack;
 }
 /*
 * Calculates the stack items result based on precedence
 */
 Calculator.prototype.calculateStackItems= function(stack){
+  let response = null;
   let currentStack = stack;
   let tempArray = [];
   var stackSize = stack.size();
+
   //emptying the stack
   while(stackSize>0){
     tempArray.push(currentStack.pop());
     stackSize = stack.size();
   }
+
   //joining the stack items together for parsing
+  //reversing so that we keep the left to right order
   var stackOpString = tempArray.reverse().join("");
-  var parsedOperationArray = this.parseOperationString(stackOpString);
-  var output = this.performOperations(parsedOperationArray);
-  return output;
+  var opList = this.getOpList();
+  var opFunctions = this.getOpFunctions();
+  response = this.parseAndCalculate(stackOpString,opList,opFunctions);
+
+  return response;
 }
+
+
+//Parses the provided operation string into floats and operands
+Calculator.prototype.parseOperationString = function(opString,opList) {
+  let response = [];
+  var current = '';
+  var string = opString;
+  //join the op list for determining operator positions from opString
+  var operationsList = opList.join("");
+
+  for (var i = 0, ch; ch = string.charAt(i); i++) {
+    //find the indexes of al the operators present in the opString
+    var operaterPosition = operationsList.indexOf(ch);
+    if ( operaterPosition > -1) {
+      if (current == '' && ch == '-') {
+        //beginning of a signed integer
+        current = '-';
+      } else {
+        if(current !== ''){
+          //number
+          response.push(parseFloat(current), ch);
+          current = '';
+        }else{
+          //operator
+          response.push(current,ch);
+        }
+      }
+    } else {
+      //No operators
+      current += string.charAt(i);
+    }
+  }
+  if (current !== '') {
+    //Number
+    response.push(parseFloat(current));
+  }
+
+  return response;
+}
+
 /*
 * Takes a array with parsed arguments and operators as an input
 * calculates the result of all operations in the given array based on OpPresidence
 */
-Calculator.prototype.performOperations= function(array){
+Calculator.prototype.performOperations= function(array,opFunctions){
+  let response=null;
   //getting the operation functions from the calculator object
-  var opList = this.opFunctions;
+  var opList = opFunctions;
   var newArray = [];
   var currentOperator;
+
   for (var i = 0; i < opList.length; i++) {
     //iterating through the opList and calculating based on precedence
     for (var j = 0; j < array.length; j++) {
@@ -149,64 +203,38 @@ Calculator.prototype.performOperations= function(array){
     array = newArray;
     newArray = [];
   }
-  if (array.length > 1) {
-    console.log('Error :(');
-    return 'Error';
-  } else {
-    return array[0];
-  }
+
+  response = array.length > 1?'Error':array[0];
+  return response;
 }
 
-//Parses the provided operation string into floats and operands
-Calculator.prototype.parseOperationString = function(opString) {
-  var calculation = [];
-  var current = '';
-  var string = opString;
-  //join the op list for determining operator positions from opString
-  var operationsList = this.opList.join("");
-  for (var i = 0, ch; ch = string.charAt(i); i++) {
-    //find the indexes of al the operators present in the opString
-    var operaterPosition = operationsList.indexOf(ch);
-    if ( operaterPosition > -1) {
-      if (current == '' && ch == '-') {
-        //beginning of a signed integer
-        current = '-';
-      } else {
-        if(current !== ''){
-          //number
-          calculation.push(parseFloat(current), ch);
-          current = '';
-        }else{
-          //operator
-          calculation.push(current,ch);
-        }
-      }
-    } else {
-      //No operators
-      current += string.charAt(i);
-    }
-  }
-  if (current !== '') {
-    //Number
-    calculation.push(parseFloat(current));
-  }
-  return calculation;
-}
 //Clearing out the empty values from an array
-function clearArray(array){
-  var newArray = [];
+Calculator.prototype.deleteEmptyItems=function(array){
+  let response = [];
   for (var i = 0; i < array.length; i++) {
     if (array[i] !== undefined && array[i] !== null && array[i] !== "") {
-      newArray.push(array[i]);
+      response.push(array[i]);
     }
   }
-  return newArray;
+  return response;
 }
 /*
-* Checks for math operational errors in the string
+*Parses the recived string and calculates the result by performing
+*the passed opFunctions if they are present in the string
 */
-Calculator.prototype.checkError = function(string){
-  var response = false;
+Calculator.prototype.parseAndCalculate=function(bracketString,opList,opFunctions){
+  let response;
+  var parsedOperationArray = this.parseOperationString(bracketString,opList);
+  var clearedOperationArray = this.deleteEmptyItems(parsedOperationArray);
+  response = this.performOperations(clearedOperationArray,opFunctions);
+  return response;
+}
+
+/*
+* Checks for math operational errors in the string before calculation begins
+*/
+Calculator.prototype.preErrorChecks = function(string){
+  let response = false;
   var stringArray = string.split("");
   var openBracketsCount=0,closedBracketCount=0;
   stringArray.forEach(function(item,index){
@@ -222,16 +250,17 @@ Calculator.prototype.checkError = function(string){
   response = (openBracketsCount===closedBracketCount?false:true);
   return response;
 }
+
 // checks for all possible non numeric responses
 // and if true returns 'Error'
-function failChecks(value){
-var result=value;
+Calculator.prototype.postErrorChecks=function(value){
+let result=value;
   if(value!==value||value===undefined||value===null||value===""||value===Infinity){
     result='Error';
   }
   return result;
 }
-function applyDecimalPrecision(precision,result){
-  var response = (result!=='Error'?parseFloat(result.toFixed(precision)):result);
-  return response;
+
+Calculator.prototype.applyDecimalPrecision=function(precision,result){
+  return (result!=='Error'?parseFloat(result.toFixed(precision)):result);
 }
